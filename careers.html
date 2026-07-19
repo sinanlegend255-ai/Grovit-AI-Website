@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Careers — Grovit AI</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f4f0e8;
+    --gold: #c8a96e;
+    --gold-light: #e8d5a3;
+    --red: #c94040;
+    --muted: #6b6760;
+    --border: rgba(200,169,110,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    pointer-events: none; mix-blend-mode: difference;
+  }
+  .cursor-dot {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: all 0.18s ease;
+    opacity: 0.6;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 1000;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* HEADER */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .logo span { color: var(--paper); }
+  nav { display: flex; gap: 2.5rem; align-items: center; }
+  nav a {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--gold); }
+  .nav-cta {
+    border: 1px solid var(--gold);
+    padding: 0.5rem 1.4rem;
+    color: var(--gold) !important;
+    transition: all 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--gold); color: var(--ink) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 3rem 5rem;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    max-width: 800px;
+    position: relative; z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 7vw, 6.5rem);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    margin-bottom: 2rem;
+  }
+  h1 em {
+    font-style: italic;
+    font-family: 'DM Serif Display', serif;
+    color: var(--gold);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 0.75rem;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 550px;
+    margin-bottom: 2rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* SECTION / GRID */
+  .careers-section {
+    padding: 7rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 5rem;
+    align-items: start;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .careers-info {
+    position: sticky;
+    top: 120px;
+  }
+
+  .section-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    line-height: 1.15;
+    font-weight: 400;
+    margin-bottom: 2.5rem;
+  }
+  h2 em { font-style: italic; color: var(--gold); }
+
+  /* OPEN ROLES LIST */
+  .roles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .role-card {
+    background: rgba(255,255,255,0.01);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .role-card:hover {
+    background: rgba(200,169,110,0.03);
+    border-color: var(--gold);
+  }
+  .role-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    color: var(--paper);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .role-meta {
+    font-size: 0.6rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1.5rem;
+  }
+  .role-desc {
+    font-size: 0.68rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  /* FORM STYLING */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255,255,255,0.01);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    border-radius: 2px;
+    position: relative;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .form-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-input, .form-select, .form-textarea {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    padding: 0.7rem 0.9rem;
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s;
+    border-radius: 2px;
+  }
+  .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--gold);
+    background: rgba(200,169,110,0.04);
+  }
+  .form-select option {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--ink);
+    padding: 0.9rem 2.2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border: none;
+    cursor: none;
+    font-weight: 500;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+  .btn-primary:hover::after { transform: scaleX(1); }
+  .btn-primary:hover { color: var(--paper); }
+
+  /* FOOTER */
+  footer {
+    padding: 2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-left { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+  .footer-right { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+
+  /* STATUS INDICATOR */
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4caf50;
+    display: inline-block;
+    animation: pulse 2s infinite;
+    margin-right: 0.4rem;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  @media (max-width: 900px) {
+    .hero { padding-top: 100px; min-height: 50vh; }
+    .careers-section { grid-template-columns: 1fr; gap: 4rem; }
+    .careers-info { position: relative; top: 0; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 0.8rem; text-decoration: none;">
+    <img src="logo.png" alt="Grovit AI Logo" style="height: 38px; width: 38px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);">
+    <span style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.15em; color: var(--paper);">Grovit <span style="color: var(--gold);">AI</span></span>
+  </a>
+  <nav>
+    <a href="index.html#">Digital CEO</a>
+    <a href="index.html#">AI Development</a>
+    <a href="careers.html">Careers</a>
+    <a href="index.html#contact" class="nav-cta">Contact Us</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span class="status-dot"></span>Join the Core</div>
+    <h1>Build the future<br><em>of AI Operations</em></h1>
+    <p class="hero-sub">
+      We are engineers, builders, and designers creating custom software that redefines how organizations scale. Discover our open positions in Chennai and remote.
+    </p>
+  </div>
+</section>
+
+<!-- CAREERS SECTION -->
+<section class="careers-section">
+  <!-- LEFT: OPEN ROLES -->
+  <div class="careers-info">
+    <div class="section-tag">Opportunities</div>
+    <h2>Open Positions<br><em>in Chennai</em></h2>
+    
+    <div class="roles-list">
+      <div class="role-card">
+        <div class="role-title">AI Software Engineer</div>
+        <div class="role-meta"><span>Chennai / Hybrid</span><span>Full-Time</span></div>
+        <p class="role-desc">Build autonomous agents, fine-tune models, and design intelligent workflows for our flagship Digital CEO platforms and custom business automation tools.</p>
+      </div>
+      <div class="role-card">
+        <div class="role-title">Full Stack Developer</div>
+        <div class="role-meta"><span>Chennai</span><span>Full-Time</span></div>
+        <p class="role-desc">Design and engineer high-performance frontend interfaces (Vite, React, vanilla layouts) and build robust serverless backend APIs to deliver flawless user experiences.</p>
+      </div>
+      <div class="role-card">
+        <div class="role-title">UI/UX Motion Designer</div>
+        <div class="role-meta"><span>Chennai / Hybrid</span><span>Full-Time</span></div>
+        <p class="role-desc">Craft state-of-the-art visual languages, dashboard interactions, and subtle micro-animations that make our client tools feel extremely premium and smooth.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: APPLY FORM -->
+  <div>
+    <div class="section-tag" style="margin-bottom: 0.8rem;">Apply Now</div>
+    <h2 style="font-family: 'DM Serif Display', serif; font-size: 2.2rem; font-weight: 400; margin-bottom: 2.5rem;">Join the<br><em>Grovit team</em></h2>
+    
+    <form class="contact-form" id="careers-form">
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name</label>
+        <input type="text" name="name" id="name" class="form-input" placeholder="Your Name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" name="email" id="email" class="form-input" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="phone">Phone Number</label>
+        <input type="tel" name="phone" id="phone" class="form-input" placeholder="Contact Number" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="position">Target Position</label>
+        <select name="position" id="position" class="form-select" required>
+          <option value="" disabled selected>Select Position</option>
+          <option value="ai_engineer">AI Software Engineer</option>
+          <option value="full_stack">Full Stack Developer</option>
+          <option value="ui_ux">UI/UX Motion Designer</option>
+          <option value="other">Other Role</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="resume">Resume / LinkedIn Link</label>
+        <input type="url" name="resume" id="resume" class="form-input" placeholder="https://linkedin.com/in/... or drive link" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="message">About Yourself <span style="font-size: 0.5rem; opacity: 0.5;">(Optional)</span></label>
+        <textarea name="message" id="message" class="form-textarea" placeholder="Briefly describe your experience and skills..."></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top: 0.5rem; width: 100%;">Submit Application</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-left" style="display: flex; align-items: center; gap: 0.8rem;">
+    <img src="logo.png" alt="Grovit AI Logo" style="height: 24px; width: 24px; border-radius: 50%; object-fit: cover;">
+    © 2026 Grovit AI Technologies. Chennai, India.
+  </span>
+  <span class="footer-right">The Digital CEO Platform</span>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const dot = cursor.querySelector('.cursor-dot');
+  const ring = cursor.querySelector('.cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+  function animCursor() {
+    rx += (mx - rx) * 0.15;
+    ry += (my - ry) * 0.15;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  document.querySelectorAll('button, a, .role-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.transform = 'translate(-50%,-50%) scale(1.6)';
+      ring.style.opacity = '1';
+      ring.style.borderColor = 'var(--gold)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.transform = 'translate(-50%,-50%) scale(1)';
+      ring.style.opacity = '0.6';
+    });
+  });
+
+  // Careers Form Submission to Google Sheets
+  const careersForm = document.getElementById('careers-form');
+  if (careersForm) {
+    careersForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = careersForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Submitting...';
+      submitBtn.disabled = true;
+      
+      const formData = new FormData(careersForm);
+      
+      // Google Script Web App URL for Careers Form
+      const scriptUrl = 'YOUR_CAREER_GOOGLE_SCRIPT_URL_HERE';
+      
+      if (scriptUrl === 'YOUR_CAREER_GOOGLE_SCRIPT_URL_HERE') {
+        console.warn('Google Apps Script URL for Careers is not configured.');
+        alert('Thank you for your application! (Form simulation: URL not yet configured).');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        careersForm.reset();
+        return;
+      }
+      
+      const urlParams = new URLSearchParams(formData).toString();
+      
+      fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: urlParams
+      })
+      .then(() => {
+        alert('Thank you for applying! We will review your profile and get in touch.');
+        careersForm.reset();
+      })
+      .catch((error) => {
+        console.error('Submission error:', error);
+        alert('There was a problem submitting your application. Please try again.');
+      })
+      .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      });
+    });
+  }
+</script>
+</body>
+</html>
