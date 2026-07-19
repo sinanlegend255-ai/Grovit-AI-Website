@@ -422,8 +422,8 @@
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label" for="resume">Resume / LinkedIn Link</label>
-        <input type="url" name="resume" id="resume" class="form-input" placeholder="https://linkedin.com/in/... or drive link" required>
+        <label class="form-label" for="resume">Attach Resume (PDF/Word)</label>
+        <input type="file" name="resume" id="resume" class="form-input" accept=".pdf,.doc,.docx" required>
       </div>
       <div class="form-group">
         <label class="form-label" for="message">About Yourself <span style="font-size: 0.5rem; opacity: 0.5;">(Optional)</span></label>
@@ -475,7 +475,7 @@
     });
   });
 
-  // Careers Form Submission to Google Sheets
+  // Careers Form Submission to Google Sheets (with File Upload to Google Drive)
   const careersForm = document.getElementById('careers-form');
   if (careersForm) {
     careersForm.addEventListener('submit', function(e) {
@@ -486,42 +486,76 @@
       submitBtn.textContent = 'Submitting...';
       submitBtn.disabled = true;
       
-      const formData = new FormData(careersForm);
+      const fileInput = document.getElementById('resume');
+      const file = fileInput.files[0];
       
-      // Google Script Web App URL for Careers Form
-      const scriptUrl = 'YOUR_CAREER_GOOGLE_SCRIPT_URL_HERE';
-      
-      if (scriptUrl === 'YOUR_CAREER_GOOGLE_SCRIPT_URL_HERE') {
-        console.warn('Google Apps Script URL for Careers is not configured.');
-        alert('Thank you for your application! (Form simulation: URL not yet configured).');
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-        careersForm.reset();
-        return;
+      function sendData(fileData = '', fileName = '', mimeType = '') {
+        const formData = new FormData(careersForm);
+        const payload = new URLSearchParams();
+        
+        // Add all text fields from the form
+        for (const [key, value] of formData.entries()) {
+          if (key !== 'resume') {
+            payload.append(key, value);
+          }
+        }
+        
+        // Add file base64 data and metadata
+        if (fileData) {
+          payload.append('fileData', fileData);
+          payload.append('fileName', fileName);
+          payload.append('mimeType', mimeType);
+        }
+        
+        // Google Script Web App URL for Careers Form
+        const scriptUrl = 'YOUR_CAREER_GOOGLE_SCRIPT_URL_HERE';
+        
+        if (scriptUrl === 'YOUR_CAREER_GOOGLE_SCRIPT_URL_HERE') {
+          console.warn('Google Apps Script URL for Careers is not configured.');
+          alert('Thank you for your application! (Form simulation: URL not yet configured).');
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+          careersForm.reset();
+          return;
+        }
+        
+        fetch(scriptUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: payload.toString()
+        })
+        .then(() => {
+          alert('Thank you for applying! We will review your profile and get in touch.');
+          careersForm.reset();
+        })
+        .catch((error) => {
+          console.error('Submission error:', error);
+          alert('There was a problem submitting your application. Please try again.');
+        })
+        .finally(() => {
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        });
       }
       
-      const urlParams = new URLSearchParams(formData).toString();
-      
-      fetch(scriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: urlParams
-      })
-      .then(() => {
-        alert('Thank you for applying! We will review your profile and get in touch.');
-        careersForm.reset();
-      })
-      .catch((error) => {
-        console.error('Submission error:', error);
-        alert('There was a problem submitting your application. Please try again.');
-      })
-      .finally(() => {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      });
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const base64Data = evt.target.result.split(',')[1];
+          sendData(base64Data, file.name, file.type);
+        };
+        reader.onerror = function() {
+          alert('Error reading file. Please try again.');
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        sendData();
+      }
     });
   }
 </script>
