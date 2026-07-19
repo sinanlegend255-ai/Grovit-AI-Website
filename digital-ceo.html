@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Digital CEO — Grovit AI</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f4f0e8;
+    --gold: #c8a96e;
+    --gold-light: #e8d5a3;
+    --red: #c94040;
+    --muted: #6b6760;
+    --border: rgba(200,169,110,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    pointer-events: none; mix-blend-mode: difference;
+  }
+  .cursor-dot {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: all 0.18s ease;
+    opacity: 0.6;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 1000;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* HEADER */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .logo span { color: var(--paper); }
+  nav { display: flex; gap: 2.5rem; align-items: center; }
+  nav a {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--gold); }
+  .nav-cta {
+    border: 1px solid var(--gold);
+    padding: 0.5rem 1.4rem;
+    color: var(--gold) !important;
+    transition: all 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--gold); color: var(--ink) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    padding: 140px 3rem 5rem;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .hero-content {
+    max-width: 900px;
+    position: relative; z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 6.5vw, 6rem);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    margin-bottom: 2rem;
+  }
+  h1 em {
+    font-style: italic;
+    font-family: 'DM Serif Display', serif;
+    color: var(--gold);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--muted);
+    max-width: 650px;
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--ink);
+    padding: 0.9rem 2.2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border: none;
+    cursor: none;
+    font-weight: 500;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+  .btn-primary:hover::after { transform: scaleX(1); }
+  .btn-primary:hover { color: var(--paper); }
+
+  /* SECTION / GRID */
+  .section { padding: 7rem 3rem; }
+  .section-header {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 2rem; align-items: end;
+    margin-bottom: 4rem;
+  }
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 6rem;
+    color: rgba(200,169,110,0.15);
+    line-height: 1;
+  }
+  .section-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    line-height: 1.15;
+    font-weight: 400;
+  }
+  h2 em { font-style: italic; color: var(--gold); }
+
+  .command-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 4rem;
+  }
+
+  .capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .cap-card {
+    background: rgba(255,255,255,0.01);
+    border: 1px solid var(--border);
+    padding: 3rem;
+    transition: background 0.3s, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .cap-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .cap-card:hover::before { transform: scaleX(1); }
+  .cap-card:hover { 
+    background: rgba(200,169,110,0.03); 
+    border-color: var(--gold);
+  }
+
+  .cap-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+  }
+  .cap-desc {
+    font-size: 0.72rem;
+    line-height: 1.85;
+    color: var(--muted);
+  }
+
+  .t-prompt { color: var(--gold); }
+  .t-highlight { color: #6ee7b7; }
+  .t-warn { color: var(--red); }
+
+  /* INTEGRATIONS DIAGRAM */
+  .diagram-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 4rem 2rem;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.01);
+    position: relative;
+  }
+  .diagram-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+  }
+  .diagram-node {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--border);
+    background: rgba(10,10,15,0.8);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    border-radius: 2px;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .diagram-node:hover {
+    border-color: var(--gold);
+    color: var(--paper);
+  }
+  .diagram-arrow {
+    font-size: 1.5rem;
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    opacity: 0.8;
+  }
+  .diagram-core {
+    padding: 1.2rem 2.5rem;
+    border: 1px solid var(--gold);
+    background: rgba(200,169,110,0.05);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    border-radius: 2px;
+    box-shadow: 0 0 15px rgba(200,169,110,0.1);
+  }
+
+  /* CTA */
+  .cta-section {
+    padding: 7rem 3rem;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4rem;
+    align-items: center;
+  }
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+  }
+  .cta-title span { color: var(--gold); }
+  .cta-actions { display: flex; flex-direction: column; gap: 1rem; align-items: flex-end; }
+  .cta-note { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-left { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+  .footer-right { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+
+  @media (max-width: 900px) {
+    .hero { padding-top: 120px; }
+    .command-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .capabilities-grid { grid-template-columns: 1fr; }
+    .cta-section { grid-template-columns: 1fr; }
+    .cta-actions { align-items: flex-start; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="index.html" class="logo" style="display: flex; align-items: center; gap: 0.8rem; text-decoration: none;">
+    <img src="logo.png" alt="Grovit AI Logo" style="height: 38px; width: 38px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border);">
+    <span style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.15em; color: var(--paper);">Grovit <span style="color: var(--gold);">AI</span></span>
+  </a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="digital-ceo.html">Digital CEO</a>
+    <a href="engineering.html">Engineering</a>
+    <a href="careers.html">Careers</a>
+    <a href="index.html#contact" class="nav-cta">Contact Us</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">The Flagship Product</div>
+    <h1>The Future Doesn't Need<br>More Dashboards.<br>It Needs Someone Watching<br>Every Number.<br><em>Meet the Digital CEO.</em></h1>
+    <p class="hero-sub">
+      An AI executive that understands your entire business, identifies opportunities, predicts risks, and helps teams make better decisions every day.
+    </p>
+    <a href="index.html#contact" class="btn-primary">Consult With Us</a>
+  </div>
+</section>
+
+<!-- THE PROBLEM SECTION -->
+<section class="section" style="border-bottom: 1px solid var(--border);">
+  <div class="section-header" style="margin-bottom: 0;">
+    <div class="section-num">01</div>
+    <div class="section-title-block">
+      <div class="section-tag">The Friction</div>
+      <h2>Too many tools,<br><em>not enough answers</em></h2>
+    </div>
+  </div>
+  
+  <div class="command-grid">
+    <div style="font-size: 0.75rem; line-height: 2; color: var(--muted); letter-spacing: 0.02em;">
+      Every modern organization runs on a sprawling web of specialized tools: **ERP systems, CRM pipelines, HRMS databases, Accounting ledgers, POS systems, Inventory sheets, Emails, and Documents**.
+      <br><br>
+      None of them actually talk to one another. Executives and department heads spend hours logging into ten separate systems just to piece together a basic operational report. 
+      <br><br>
+      <span style="color: var(--gold); font-weight: 500;">The Digital CEO does not.</span> It connects to all your existing data, reads everything, understands the context, and explains the answers in plain English so you can take action immediately.
+    </div>
+    
+    <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--border); padding: 3rem; border-radius: 2px;">
+      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--gold); letter-spacing: 0.05em; margin-bottom: 1.5rem;">Siloed Environments</div>
+      <div style="font-size: 0.65rem; color: var(--muted); line-height: 2.2; display: flex; flex-direction: column; gap: 0.4rem;">
+        <div>☒ CRM & Sales Pipelines (Dormant)</div>
+        <div>☒ POS & Inventory Ledger (Lagging)</div>
+        <div>☒ ERP & Logistics Databases (Isolated)</div>
+        <div>☒ Accounting & Cash Flows (Manual Audit)</div>
+        <div>☒ HRMS & Team Schedules (Disconnected)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORE CAPABILITIES (CARDS) -->
+<section class="section" style="border-bottom: 1px solid var(--border);">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-title-block">
+      <div class="section-tag">Product Core</div>
+      <h2>Engineered to<br><em>Synthesize & Guide</em></h2>
+    </div>
+  </div>
+
+  <div class="capabilities-grid">
+    <!-- Card 1 -->
+    <div class="cap-card">
+      <div class="cap-title">Enterprise Memory</div>
+      <p class="cap-desc">
+        Connects directly to your internal datastores, logs, and files. By indexing documents, emails, and database nodes, the Digital CEO holds a complete, context-aware memory of all business interactions.
+      </p>
+    </div>
+    <!-- Card 2 -->
+    <div class="cap-card">
+      <div class="cap-title">Business Intelligence</div>
+      <p class="cap-desc">
+        Ask natural language questions like "Why did our product delivery fail in regional stores last week?" and get precise answers backed by compiled data sources instantly. No SQL queries required.
+      </p>
+    </div>
+    <!-- Card 3 -->
+    <div class="cap-card">
+      <div class="cap-title">Predictive Planning</div>
+      <p class="cap-desc">
+        Run advanced simulations to plan for future constraints. Stress-test variables instantly: "What happens to our payroll and stock runway if revenue drops by 15% next quarter?"
+      </p>
+    </div>
+    <!-- Card 4 -->
+    <div class="cap-card">
+      <div class="cap-title">Daily Executive Briefing</div>
+      <p class="cap-desc" style="line-height: 1.7;">
+        Every morning, receive a highly-focused brief of critical anomalies and suggested solutions:
+        <span style="display: block; margin-top: 0.6rem; color: var(--paper);">
+          • Sales ↓ 8% in desserts<br>
+          • Kitchen waste ↑ 12% in Chennai central kitchen<br>
+          • Overtime exceeded budget limit by 4 hrs<br>
+          <span class="t-highlight">→ Recommendation: Reduce supplier order tomorrow by 15kg.</span>
+        </span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ENTERPRISE INTEGRATIONS -->
+<section class="section" style="border-bottom: 1px solid var(--border);">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-title-block">
+      <div class="section-tag">Architecture</div>
+      <h2>Seamless Data Flow<br><em>and Integrations</em></h2>
+    </div>
+  </div>
+
+  <div class="diagram-container">
+    <div class="diagram-row">
+      <div class="diagram-node">Stripe</div>
+      <div class="diagram-node">HubSpot</div>
+      <div class="diagram-node">QuickBooks</div>
+      <div class="diagram-node">SAP</div>
+      <div class="diagram-node">Salesforce</div>
+      <div class="diagram-node">PostgreSQL</div>
+      <div class="diagram-node">Excel</div>
+      <div class="diagram-node">Google Drive</div>
+    </div>
+    <div class="diagram-arrow">▼</div>
+    <div class="diagram-core">Digital CEO Core</div>
+    <div class="diagram-arrow">▼</div>
+    <div class="diagram-row" style="gap: 2rem;">
+      <div class="diagram-node" style="border-color: var(--gold); color: var(--gold);">Insights</div>
+      <div class="diagram-node" style="border-color: var(--gold); color: var(--gold);">Predictions</div>
+      <div class="diagram-node" style="border-color: var(--gold); color: var(--gold);">Recommendations</div>
+    </div>
+  </div>
+</section>
+
+<!-- END CTA -->
+<section class="cta-section">
+  <div>
+    <div class="section-tag" style="margin-bottom:1.2rem">Flagship Deployment</div>
+    <div class="cta-title">
+      Ready to build<br>
+      <span>your organization's</span><br>
+      Digital CEO?
+    </div>
+  </div>
+  <div class="cta-actions">
+    <a href="index.html#contact" class="btn-primary">Consult With Us</a>
+    <span class="cta-note">Operating from Chennai, serving clients globally</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-left" style="display: flex; align-items: center; gap: 0.8rem;">
+    <img src="logo.png" alt="Grovit AI Logo" style="height: 24px; width: 24px; border-radius: 50%; object-fit: cover;">
+    © 2026 Grovit AI Technologies. Chennai, India.
+  </span>
+  <span class="footer-right">The Digital CEO Platform</span>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const dot = cursor.querySelector('.cursor-dot');
+  const ring = cursor.querySelector('.cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+  function animCursor() {
+    rx += (mx - rx) * 0.15;
+    ry += (my - ry) * 0.15;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  document.querySelectorAll('button, a, .cap-card, .diagram-node').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.transform = 'translate(-50%,-50%) scale(1.6)';
+      ring.style.opacity = '1';
+      ring.style.borderColor = 'var(--gold)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.transform = 'translate(-50%,-50%) scale(1)';
+      ring.style.opacity = '0.6';
+    });
+  });
+</script>
+</body>
+</html>
