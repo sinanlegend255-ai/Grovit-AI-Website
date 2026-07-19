@@ -613,6 +613,49 @@
     .cta-section { grid-template-columns: 1fr; }
     nav { display: none; }
   }
+
+  /* FORM STYLING */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255,255,255,0.01);
+    border: 1px solid var(--border);
+    padding: 2.2rem;
+    border-radius: 2px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .form-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-input, .form-select {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    padding: 0.7rem 0.9rem;
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s;
+    border-radius: 2px;
+  }
+  .form-input:focus, .form-select:focus {
+    border-color: var(--gold);
+    background: rgba(200,169,110,0.04);
+  }
+  .form-select option {
+    background: var(--ink);
+    color: var(--paper);
+  }
 </style>
 </head>
 <body>
@@ -633,7 +676,7 @@
     <a href="#">AI Development</a>
     <a href="#">Deployments</a>
     <a href="#">Chennai HQ</a>
-    <a href="#" class="nav-cta">Request Access</a>
+    <a href="#contact" class="nav-cta">Contact Us</a>
   </nav>
 </header>
 
@@ -652,11 +695,7 @@
       We engineer custom software powered by state-of-the-art AI for rapid development and flawless, high-performance digital experiences tailored to your needs. Empower your organization with our flagship product: the Digital CEO.
     </p>
     <div class="hero-actions fade-up delay-3">
-      <button class="btn-primary">Deploy Now</button>
-      <button class="btn-ghost">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-        Watch Briefing
-      </button>
+      <button class="btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})">Contact Us</button>
     </div>
   </div>
 
@@ -875,7 +914,7 @@
 </section>
 
 <!-- CTA -->
-<section class="cta-section">
+<section class="cta-section" id="contact">
   <div>
     <div class="section-tag" style="margin-bottom:1.2rem">Start Building Today</div>
     <div class="cta-title">
@@ -883,11 +922,38 @@
       <span>custom AI</span><br>
       software?
     </div>
+    <p class="hero-sub" style="margin-top: 2rem; max-width: 450px; line-height: 1.8; color: var(--muted);">
+      Partner with Grovit AI to build customized systems. Let's design a flawless user experience tailored precisely to your requirements.
+    </p>
   </div>
-  <div class="cta-actions">
-    <button class="btn-primary">Consult With Us</button>
-    <span class="cta-note">Operating from Chennai, serving clients globally</span>
-  </div>
+  
+  <form class="contact-form" onsubmit="event.preventDefault(); alert('Thank you for reaching out! We will contact you shortly.'); this.reset();">
+    <div class="form-group">
+      <label class="form-label" for="name">Name</label>
+      <input type="text" id="name" class="form-input" placeholder="Your Name" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="org">Organisation <span style="font-size: 0.5rem; opacity: 0.5;">(Optional)</span></label>
+      <input type="text" id="org" class="form-input" placeholder="Company / Startup Name">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="phone">Phone Number</label>
+      <input type="tel" id="phone" class="form-input" placeholder="Contact / Mobile Number" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="category">Requirement Category</label>
+      <select id="category" class="form-select" required>
+        <option value="" disabled selected>Select Requirement</option>
+        <option value="custom_solution">Custom AI Solution</option>
+        <option value="digital_ceo">Digital CEO Platform</option>
+        <option value="restaurant_pos">Restaurant POS & Kitchen Sync</option>
+        <option value="signage_cms">Remote TV Ad Signage CMS</option>
+        <option value="app_development">Mobile or Web App</option>
+        <option value="other">Other Inquiry</option>
+      </select>
+    </div>
+    <button type="submit" class="btn-primary" style="margin-top: 0.5rem; width: 100%;">Submit Request</button>
+  </form>
 </section>
 
 <!-- FOOTER -->
