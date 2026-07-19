@@ -927,22 +927,22 @@
     </p>
   </div>
   
-  <form class="contact-form" onsubmit="event.preventDefault(); alert('Thank you for reaching out! We will contact you shortly.'); this.reset();">
+  <form class="contact-form" id="contact-form">
     <div class="form-group">
       <label class="form-label" for="name">Name</label>
-      <input type="text" id="name" class="form-input" placeholder="Your Name" required>
+      <input type="text" name="name" id="name" class="form-input" placeholder="Your Name" required>
     </div>
     <div class="form-group">
       <label class="form-label" for="org">Organisation <span style="font-size: 0.5rem; opacity: 0.5;">(Optional)</span></label>
-      <input type="text" id="org" class="form-input" placeholder="Company / Startup Name">
+      <input type="text" name="org" id="org" class="form-input" placeholder="Company / Startup Name">
     </div>
     <div class="form-group">
       <label class="form-label" for="phone">Phone Number</label>
-      <input type="tel" id="phone" class="form-input" placeholder="Contact / Mobile Number" required>
+      <input type="tel" name="phone" id="phone" class="form-input" placeholder="Contact / Mobile Number" required>
     </div>
     <div class="form-group">
       <label class="form-label" for="category">Requirement Category</label>
-      <select id="category" class="form-select" required>
+      <select name="category" id="category" class="form-select" required>
         <option value="" disabled selected>Select Requirement</option>
         <option value="custom_solution">Custom AI Solution</option>
         <option value="digital_ceo">Digital CEO Platform</option>
@@ -1022,6 +1022,56 @@
   document.querySelectorAll('.pillar').forEach((el, i) => {
     el.style.animationDelay = (i * 0.12) + 's';
   });
+
+  // Contact Form Submission to Google Sheets
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Submitting...';
+      submitBtn.disabled = true;
+      
+      const formData = new FormData(contactForm);
+      
+      // Google Script Web App URL (Replace with your deployed Web App URL)
+      const scriptUrl = 'YOUR_GOOGLE_SCRIPT_URL_HERE';
+      
+      if (scriptUrl === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+        console.warn('Google Apps Script URL is not configured.');
+        alert('Thank you for reaching out! (Form simulation: URL not yet configured).');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        contactForm.reset();
+        return;
+      }
+      
+      const urlParams = new URLSearchParams(formData).toString();
+      
+      fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: urlParams
+      })
+      .then(() => {
+        alert('Thank you for reaching out! We have received your request.');
+        contactForm.reset();
+      })
+      .catch((error) => {
+        console.error('Submission error:', error);
+        alert('There was a problem submitting your request. Please try again.');
+      })
+      .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      });
+    });
+  }
 </script>
 </body>
 </html>
