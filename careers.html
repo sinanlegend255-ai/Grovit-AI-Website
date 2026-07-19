@@ -421,6 +421,13 @@
           <option value="other">Other Role</option>
         </select>
       </div>
+      <div class="form-group" id="links-container">
+        <label class="form-label">LinkedIn / Portfolio Links <span style="font-size: 0.5rem; opacity: 0.5;">(Max 3)</span></label>
+        <div class="link-input-wrapper" style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+          <input type="url" name="portfolio_link" class="form-input portfolio-link-input" placeholder="https://linkedin.com/in/... or portfolio link" style="flex: 1;" required>
+          <button type="button" id="add-link-btn" class="btn-primary" style="padding: 0.7rem 1.1rem; font-size: 0.8rem; margin: 0; line-height: 1;">+</button>
+        </div>
+      </div>
       <div class="form-group">
         <label class="form-label" for="resume">Attach Resume (PDF/Word)</label>
         <input type="file" name="resume" id="resume" class="form-input" accept=".pdf,.doc,.docx" required>
@@ -475,6 +482,72 @@
     });
   });
 
+  // Dynamic Portfolio Links Appending (Max 3)
+  const linksContainer = document.getElementById('links-container');
+  const addLinkBtn = document.getElementById('add-link-btn');
+
+  if (addLinkBtn && linksContainer) {
+    addLinkBtn.addEventListener('click', function() {
+      const wrappers = linksContainer.querySelectorAll('.link-input-wrapper');
+      if (wrappers.length < 3) {
+        const newIndex = wrappers.length + 1;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'link-input-wrapper';
+        wrapper.style.display = 'flex';
+        wrapper.style.gap = '0.5rem';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.marginBottom = '0.5rem';
+        
+        wrapper.innerHTML = `
+          <input type="url" name="portfolio_link" class="form-input portfolio-link-input" placeholder="Portfolio / LinkedIn Link ${newIndex}" style="flex: 1;" required>
+          <button type="button" class="remove-link-btn" style="background: none; border: 1px solid var(--red); color: var(--red); padding: 0.7rem 0.9rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; cursor: none; border-radius: 2px; transition: all 0.2s;">×</button>
+        `;
+        
+        linksContainer.appendChild(wrapper);
+        
+        // Add cursor hover listeners for the new remove button
+        const removeBtn = wrapper.querySelector('.remove-link-btn');
+        removeBtn.addEventListener('mouseenter', () => {
+          ring.style.transform = 'translate(-50%,-50%) scale(1.6)';
+          ring.style.opacity = '1';
+          ring.style.borderColor = 'var(--red)';
+        });
+        removeBtn.addEventListener('mouseleave', () => {
+          ring.style.transform = 'translate(-50%,-50%) scale(1)';
+          ring.style.opacity = '0.6';
+          ring.style.borderColor = 'var(--gold)';
+        });
+        
+        // Handle click for removing the input
+        removeBtn.addEventListener('click', function() {
+          wrapper.remove();
+          updateAddBtnVisibility();
+          reindexPlaceholders();
+        });
+        
+        updateAddBtnVisibility();
+      }
+    });
+  }
+
+  function updateAddBtnVisibility() {
+    const wrappers = linksContainer.querySelectorAll('.link-input-wrapper');
+    if (wrappers.length >= 3) {
+      addLinkBtn.style.display = 'none';
+    } else {
+      addLinkBtn.style.display = 'block';
+    }
+  }
+
+  function reindexPlaceholders() {
+    const inputs = linksContainer.querySelectorAll('.portfolio-link-input');
+    inputs.forEach((input, index) => {
+      if (index > 0) {
+        input.placeholder = `Portfolio / LinkedIn Link ${index + 1}`;
+      }
+    });
+  }
+
   // Careers Form Submission to Google Sheets (with File Upload to Google Drive)
   const careersForm = document.getElementById('careers-form');
   if (careersForm) {
@@ -493,12 +566,22 @@
         const formData = new FormData(careersForm);
         const payload = new URLSearchParams();
         
-        // Add all text fields from the form
+        // Add all text fields from the form (skipping files and portfolio_link array)
         for (const [key, value] of formData.entries()) {
-          if (key !== 'resume') {
+          if (key !== 'resume' && key !== 'portfolio_link') {
             payload.append(key, value);
           }
         }
+        
+        // Compile dynamic portfolio links into a single string
+        const linkInputs = careersForm.querySelectorAll('.portfolio-link-input');
+        const linksArray = [];
+        linkInputs.forEach(input => {
+          if (input.value.trim()) {
+            linksArray.push(input.value.trim());
+          }
+        });
+        payload.append('links', linksArray.join(', '));
         
         // Add file base64 data and metadata
         if (fileData) {
@@ -516,6 +599,7 @@
           submitBtn.textContent = originalText;
           submitBtn.disabled = false;
           careersForm.reset();
+          resetDynamicLinks();
           return;
         }
         
@@ -530,6 +614,7 @@
         .then(() => {
           alert('Thank you for applying! We will review your profile and get in touch.');
           careersForm.reset();
+          resetDynamicLinks();
         })
         .catch((error) => {
           console.error('Submission error:', error);
@@ -539,6 +624,17 @@
           submitBtn.textContent = originalText;
           submitBtn.disabled = false;
         });
+      }
+      
+      function resetDynamicLinks() {
+        // Remove additional link input wrappers
+        const wrappers = linksContainer.querySelectorAll('.link-input-wrapper');
+        wrappers.forEach((wrapper, index) => {
+          if (index > 0) {
+            wrapper.remove();
+          }
+        });
+        updateAddBtnVisibility();
       }
       
       if (file) {
