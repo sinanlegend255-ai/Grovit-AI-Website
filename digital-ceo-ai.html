@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX — Digital CEO</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0f;
+    --paper: #f4f0e8;
+    --gold: #c8a96e;
+    --gold-light: #e8d5a3;
+    --red: #c94040;
+    --muted: #6b6760;
+    --border: rgba(200,169,110,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    pointer-events: none; mix-blend-mode: difference;
+  }
+  .cursor-dot {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: all 0.18s ease;
+    opacity: 0.6;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 1000;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* HEADER */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .logo span { color: var(--paper); }
+  nav { display: flex; gap: 2.5rem; align-items: center; }
+  nav a {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--gold); }
+  .nav-cta {
+    border: 1px solid var(--gold);
+    padding: 0.5rem 1.4rem;
+    color: var(--gold) !important;
+    transition: all 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--gold); color: var(--ink) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 5rem 3rem 5rem 3rem;
+    position: relative; z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 8vw, 8rem);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    margin-bottom: 2rem;
+  }
+  h1 em {
+    font-style: italic;
+    font-family: 'DM Serif Display', serif;
+    color: var(--gold);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 0.75rem;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 400px;
+    margin-bottom: 3rem;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-actions { display: flex; gap: 1.2rem; align-items: center; }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--ink);
+    padding: 0.9rem 2.2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    border: none;
+    cursor: none;
+    font-weight: 500;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+  .btn-primary:hover::after { transform: scaleX(1); }
+  .btn-primary:hover { color: var(--paper); }
+
+  .btn-ghost {
+    color: var(--muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 0.6rem;
+    cursor: none;
+    transition: color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--paper); }
+  .btn-ghost svg { width: 14px; height: 14px; }
+
+  /* HERO RIGHT — AI TERMINAL */
+  .hero-right {
+    display: flex; align-items: center; justify-content: center;
+    padding: 5rem 3rem;
+    position: relative; z-index: 2;
+  }
+
+  .ai-terminal {
+    width: 100%; max-width: 480px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    animation: terminalFadeIn 1.2s ease 0.5s both;
+  }
+
+  @keyframes terminalFadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .terminal-bar {
+    background: rgba(200,169,110,0.08);
+    border-bottom: 1px solid var(--border);
+    padding: 0.8rem 1.2rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .t-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .t-dot:nth-child(1) { background: var(--red); }
+  .t-dot:nth-child(2) { background: var(--gold); }
+  .t-dot:nth-child(3) { background: #4caf50; }
+  .terminal-title {
+    margin-left: auto; margin-right: auto;
+    font-size: 0.55rem; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  .terminal-body {
+    padding: 1.8rem;
+    font-size: 0.7rem;
+    line-height: 1.8;
+    min-height: 340px;
+  }
+
+  .t-line { margin-bottom: 0.3rem; }
+  .t-prompt { color: var(--gold); }
+  .t-cmd { color: var(--paper); }
+  .t-out { color: var(--muted); padding-left: 1rem; }
+  .t-highlight { color: #6ee7b7; }
+  .t-warn { color: var(--red); }
+  .t-cursor {
+    display: inline-block;
+    width: 7px; height: 13px;
+    background: var(--gold);
+    vertical-align: middle;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 0%,49% { opacity:1; } 50%,100% { opacity:0; } }
+
+  /* STATS STRIP */
+  .stats-strip {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    overflow: hidden;
+  }
+  .stat-item {
+    padding: 2.5rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: background 0.3s;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item:hover { background: rgba(200,169,110,0.04); }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: var(--gold);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    display: block;
+  }
+
+  /* CAPABILITIES */
+  .section { padding: 7rem 3rem; }
+  .section-header {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 2rem; align-items: end;
+    margin-bottom: 4rem;
+  }
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 6rem;
+    color: rgba(200,169,110,0.15);
+    line-height: 1;
+  }
+  .section-title-block {}
+  .section-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    line-height: 1.15;
+    font-weight: 400;
+  }
+  h2 em { font-style: italic; color: var(--gold); }
+
+  .capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .cap-card {
+    background: var(--ink);
+    padding: 2.5rem;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .cap-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .cap-card:hover::before { transform: scaleX(1); }
+  .cap-card:hover { background: rgba(200,169,110,0.03); }
+
+  .cap-icon {
+    width: 42px; height: 42px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+    color: var(--gold);
+  }
+  .cap-icon svg { width: 18px; height: 18px; }
+  .cap-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    margin-bottom: 0.8rem;
+    font-weight: 400;
+  }
+  .cap-desc {
+    font-size: 0.68rem;
+    line-height: 1.85;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .cap-tag {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(200,169,110,0.3);
+    padding-bottom: 2px;
+  }
+
+  /* COMMAND CENTER */
+  .command-section {
+    padding: 7rem 3rem;
+    background: rgba(200,169,110,0.03);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .command-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 5rem;
+    align-items: center;
+    margin-top: 4rem;
+  }
+  .command-metrics {
+    display: flex; flex-direction: column; gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .metric-row {
+    background: var(--ink);
+    padding: 1.2rem 1.8rem;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.2s;
+  }
+  .metric-row:hover { background: rgba(200,169,110,0.04); }
+  .metric-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .metric-value {
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .metric-bar {
+    width: 100px; height: 2px;
+    background: rgba(200,169,110,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .metric-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    animation: barGrow 1.5s ease both;
+  }
+  @keyframes barGrow { from { width: 0; } }
+  .metric-pct {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    min-width: 40px; text-align: right;
+  }
+
+  .command-info {}
+  .command-desc {
+    font-size: 0.73rem;
+    line-height: 2;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.02em;
+  }
+  .command-pillars {
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  .pillar {
+    display: flex; gap: 1.2rem; align-items: flex-start;
+  }
+  .pillar-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: rgba(200,169,110,0.3);
+    line-height: 1;
+    min-width: 30px;
+  }
+  .pillar-text { font-size: 0.68rem; line-height: 1.7; }
+  .pillar-text strong {
+    display: block;
+    color: var(--paper);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.6rem;
+    margin-bottom: 0.2rem;
+  }
+  .pillar-text span { color: var(--muted); }
+
+  /* TICKER */
+  .ticker {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.8rem 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-inner {
+    display: flex; gap: 4rem;
+    animation: tickerScroll 25s linear infinite;
+    white-space: nowrap;
+  }
+  @keyframes tickerScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .ticker-item {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .ticker-item::before {
+    content: '◆';
+    color: var(--gold);
+    font-size: 0.4rem;
+  }
+
+  /* MANIFESTO */
+  .manifesto {
+    padding: 9rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .manifesto::before {
+    content: 'APEX';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22vw;
+    color: rgba(200,169,110,0.03);
+    white-space: nowrap;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .manifesto-quote {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 3rem);
+    line-height: 1.4;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    font-weight: 400;
+    position: relative; z-index: 2;
+  }
+  .manifesto-quote em { font-style: italic; color: var(--gold); }
+  .manifesto-attr {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    position: relative; z-index: 2;
+  }
+
+  /* CTA FINAL */
+  .cta-section {
+    padding: 7rem 3rem;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4rem;
+    align-items: center;
+  }
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+  }
+  .cta-title span { color: var(--gold); }
+  .cta-actions { display: flex; flex-direction: column; gap: 1rem; align-items: flex-end; }
+  .cta-note { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-left { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+  .footer-right { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+
+  /* ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(25px);
+    animation: fadeUp 0.9s ease forwards;
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .delay-1 { animation-delay: 0.15s; }
+  .delay-2 { animation-delay: 0.3s; }
+  .delay-3 { animation-delay: 0.45s; }
+  .delay-4 { animation-delay: 0.6s; }
+  .delay-5 { animation-delay: 0.75s; }
+
+  /* STATUS INDICATOR */
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4caf50;
+    display: inline-block;
+    animation: pulse 2s infinite;
+    margin-right: 0.4rem;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .capabilities-grid { grid-template-columns: 1fr; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .command-grid { grid-template-columns: 1fr; }
+    .cta-section { grid-template-columns: 1fr; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="#" class="logo">APE<span>X</span></a>
+  <nav>
+    <a href="#">Command</a>
+    <a href="#">Intelligence</a>
+    <a href="#">Ventures</a>
+    <a href="#">Studio</a>
+    <a href="#" class="nav-cta">Request Access</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+
+  <div class="hero-left">
+    <div class="hero-eyebrow fade-up"><span class="status-dot"></span>AI Executive Suite — Active</div>
+    <h1 class="fade-up delay-1">
+      Lead<br>
+      <em>Smarter.</em><br>
+      Scale<br>Faster.
+    </h1>
+    <p class="hero-sub fade-up delay-2">
+      The AI-native operating system for the modern executive. Command your enterprise with machine-precision intelligence — decisions, forecasts, and strategy synthesized in real time.
+    </p>
+    <div class="hero-actions fade-up delay-3">
+      <button class="btn-primary">Deploy Now</button>
+      <button class="btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        Watch Briefing
+      </button>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="ai-terminal">
+      <div class="terminal-bar">
+        <span class="t-dot"></span>
+        <span class="t-dot"></span>
+        <span class="t-dot"></span>
+        <span class="terminal-title">APEX Intelligence Core v4.1</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">▶ </span><span class="t-cmd">apex.run --brief morning_report</span></div>
+        <div class="t-line t-out">Scanning 847 data points...</div>
+        <div class="t-line t-out">Cross-referencing market signals...</div>
+        <div class="t-line" style="margin-top:0.8rem"><span class="t-prompt">✓ </span><span class="t-highlight">Executive Brief Ready</span></div>
+        <div class="t-line t-out" style="margin-top:0.5rem">Revenue forecast: <span class="t-highlight">+12.4% QoQ</span></div>
+        <div class="t-line t-out">Pipeline health: <span class="t-highlight">Excellent</span></div>
+        <div class="t-line t-out">Risk index: <span class="t-warn">⚠ 2 items flagged</span></div>
+        <div class="t-line t-out">Team morale score: <span class="t-highlight">84/100</span></div>
+        <div class="t-line" style="margin-top:0.8rem"><span class="t-prompt">▶ </span><span class="t-cmd">apex.recommend --action priority</span></div>
+        <div class="t-line t-out" style="margin-top:0.3rem">1. Close Series B discussions by Fri</div>
+        <div class="t-line t-out">2. Delay EMEA launch — optimize first</div>
+        <div class="t-line t-out">3. Promote K. Chen to VP Operations</div>
+        <div class="t-line" style="margin-top:0.8rem"><span class="t-prompt">▶ </span><span class="t-cmd">_</span><span class="t-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-item fade-up">
+    <span class="stat-num">2.4B</span>
+    <span class="stat-label">Data points processed daily</span>
+  </div>
+  <div class="stat-item fade-up delay-1">
+    <span class="stat-num">94%</span>
+    <span class="stat-label">Decision accuracy rate</span>
+  </div>
+  <div class="stat-item fade-up delay-2">
+    <span class="stat-num">340</span>
+    <span class="stat-label">Enterprise CEOs deployed</span>
+  </div>
+  <div class="stat-item fade-up delay-3">
+    <span class="stat-num">18×</span>
+    <span class="stat-label">Faster strategic synthesis</span>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">AI-Powered Strategy</span>
+    <span class="ticker-item">Real-Time Intelligence</span>
+    <span class="ticker-item">Executive Automation</span>
+    <span class="ticker-item">Predictive Forecasting</span>
+    <span class="ticker-item">Boardroom Intelligence</span>
+    <span class="ticker-item">Decision Synthesis</span>
+    <span class="ticker-item">Risk Mitigation AI</span>
+    <span class="ticker-item">Growth Command Center</span>
+    <span class="ticker-item">AI-Powered Strategy</span>
+    <span class="ticker-item">Real-Time Intelligence</span>
+    <span class="ticker-item">Executive Automation</span>
+    <span class="ticker-item">Predictive Forecasting</span>
+    <span class="ticker-item">Boardroom Intelligence</span>
+    <span class="ticker-item">Decision Synthesis</span>
+    <span class="ticker-item">Risk Mitigation AI</span>
+    <span class="ticker-item">Growth Command Center</span>
+  </div>
+</div>
+
+<!-- CAPABILITIES -->
+<section class="section">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-title-block">
+      <div class="section-tag">Core Intelligence</div>
+      <h2>Six pillars of the<br><em>Digital Executive</em></h2>
+    </div>
+  </div>
+  <div class="capabilities-grid">
+    <div class="cap-card">
+      <div class="cap-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="cap-title">Strategic Intelligence</div>
+      <p class="cap-desc">AI synthesizes market data, competitor moves, and internal performance into clear strategic directives. No more analysis paralysis — get conviction fast.</p>
+      <span class="cap-tag">Always On</span>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="cap-title">Revenue Forecasting</div>
+      <p class="cap-desc">Machine learning models trained on 10 years of enterprise data predict revenue trajectories, identify pipeline gaps, and surface closing opportunities.</p>
+      <span class="cap-tag">Predictive</span>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <div class="cap-title">Decision Velocity</div>
+      <p class="cap-desc">Turn weeks of due diligence into hours. APEX pre-runs scenario modeling, stress tests assumptions, and presents ranked options with expected outcomes.</p>
+      <span class="cap-tag">18× Faster</span>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="cap-title">Talent Intelligence</div>
+      <p class="cap-desc">Map performance, sentiment, and potential across your organization. Know who to promote, retain, and develop before they show up on your radar.</p>
+      <span class="cap-tag">Org-Wide</span>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="cap-title">Risk Command</div>
+      <p class="cap-desc">Real-time threat detection across legal, financial, operational, and reputational vectors. Automated escalation protocols ensure nothing blindsides the board.</p>
+      <span class="cap-tag">Zero-Blind-Spots</span>
+    </div>
+    <div class="cap-card">
+      <div class="cap-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <div class="cap-title">Board Narration</div>
+      <p class="cap-desc">Auto-generate boardroom-ready presentations, investor updates, and earnings narratives. Draft, review, and ship in a fraction of the time.</p>
+      <span class="cap-tag">Automated</span>
+    </div>
+  </div>
+</section>
+
+<!-- COMMAND CENTER -->
+<section class="command-section">
+  <div class="section-header" style="margin-bottom:0">
+    <div class="section-num">02</div>
+    <div class="section-title-block">
+      <div class="section-tag">Performance Dashboard</div>
+      <h2>Your enterprise,<br><em>at a glance</em></h2>
+    </div>
+  </div>
+  <div class="command-grid">
+    <div class="command-metrics">
+      <div class="metric-row">
+        <span class="metric-label">Revenue Attainment</span>
+        <div class="metric-value">
+          <div class="metric-bar"><div class="metric-bar-fill" style="width:87%"></div></div>
+          <span class="metric-pct">87%</span>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Pipeline Coverage</span>
+        <div class="metric-value">
+          <div class="metric-bar"><div class="metric-bar-fill" style="width:92%"></div></div>
+          <span class="metric-pct">3.2×</span>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Operational Efficiency</span>
+        <div class="metric-value">
+          <div class="metric-bar"><div class="metric-bar-fill" style="width:74%"></div></div>
+          <span class="metric-pct">74%</span>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Team Engagement</span>
+        <div class="metric-value">
+          <div class="metric-bar"><div class="metric-bar-fill" style="width:84%"></div></div>
+          <span class="metric-pct">84%</span>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">AI Decision Adoption</span>
+        <div class="metric-value">
+          <div class="metric-bar"><div class="metric-bar-fill" style="width:96%"></div></div>
+          <span class="metric-pct">96%</span>
+        </div>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Risk Score</span>
+        <div class="metric-value">
+          <div class="metric-bar"><div class="metric-bar-fill" style="width:18%; background: var(--red)"></div></div>
+          <span class="metric-pct" style="color:var(--red)">Low</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="command-info">
+      <p class="command-desc">
+        APEX gives you a single pane of glass across every critical business function. No more context-switching between tools, no more stale data — every metric live, every insight actionable.
+      </p>
+      <div class="command-pillars">
+        <div class="pillar">
+          <span class="pillar-num">01</span>
+          <div class="pillar-text">
+            <strong>Unified Data Layer</strong>
+            <span>CRM, ERP, HR, finance, and ops — all synthesized into one coherent intelligence stream.</span>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">02</span>
+          <div class="pillar-text">
+            <strong>Proactive Alerts</strong>
+            <span>Don't wait for reports. APEX detects anomalies and surfaces them before they become problems.</span>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">03</span>
+          <div class="pillar-text">
+            <strong>Executive Briefings</strong>
+            <span>Every morning, a 90-second AI brief covers everything that happened overnight and what it means for today.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto">
+  <p class="manifesto-quote">
+    "The best CEOs won't be replaced by AI — <em>they'll be the ones who harness it</em> while others are still debating it."
+  </p>
+  <span class="manifesto-attr">— APEX Philosophy</span>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div>
+    <div class="section-tag" style="margin-bottom:1.2rem">Get Started Today</div>
+    <div class="cta-title">
+      Ready to lead<br>
+      <span>at machine</span><br>
+      speed?
+    </div>
+  </div>
+  <div class="cta-actions">
+    <button class="btn-primary">Request Early Access</button>
+    <span class="cta-note">No credit card — 30-day pilot</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-left">© 2026 APEX Intelligence Corp.</span>
+  <span class="footer-right">The Digital CEO Platform</span>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const dot = cursor.querySelector('.cursor-dot');
+  const ring = cursor.querySelector('.cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+  function animCursor() {
+    rx += (mx - rx) * 0.15;
+    ry += (my - ry) * 0.15;
+    dot.style.left = mx + 'px';
+    dot.style.top = my + 'px';
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  document.querySelectorAll('button, a, .cap-card, .stat-item, .metric-row').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.transform = 'translate(-50%,-50%) scale(1.6)';
+      ring.style.opacity = '1';
+      ring.style.borderColor = 'var(--gold)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.transform = 'translate(-50%,-50%) scale(1)';
+      ring.style.opacity = '0.6';
+    });
+  });
+
+  // Intersection observer for fade-up
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.animationPlayState = 'running';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.cap-card, .stat-item, .metric-row, .pillar').forEach(el => {
+    el.style.opacity = '0';
+    el.style.animation = 'fadeUp 0.7s ease forwards paused';
+    obs.observe(el);
+  });
+
+  // Stagger cap cards
+  document.querySelectorAll('.cap-card').forEach((el, i) => {
+    el.style.animationDelay = (i * 0.1) + 's';
+  });
+  document.querySelectorAll('.metric-row').forEach((el, i) => {
+    el.style.animationDelay = (i * 0.08) + 's';
+  });
+  document.querySelectorAll('.pillar').forEach((el, i) => {
+    el.style.animationDelay = (i * 0.12) + 's';
+  });
+</script>
+</body>
+</html>
